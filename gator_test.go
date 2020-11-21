@@ -100,10 +100,12 @@ func BenchmarkAssignPointerStackedRegions(b *testing.B) { // 6.34 ns/op
 
 	b.ResetTimer()
 
+	failed := false
 	for n := 0; n < b.N; n++ {
-		if !AssignPointer(sub, 0, root, 0) {
-			b.Fatalf("failed to assign")
-		}
+		failed = failed || !AssignPointer(sub, 0, root, 0)
+	}
+	if failed {
+		b.Fatalf("failed to assign")
 	}
 }
 
@@ -117,9 +119,11 @@ func BenchmarkAssignPointerSameRegion(b *testing.B) { // 5.70 ns/op
 
 	b.ResetTimer()
 
+	failed := false
 	for n := 0; n < b.N; n++ {
-		if !AssignPointer(root, 0, root, 8) {
-			b.Fatalf("failed to assign")
-		}
+		failed = failed || !AssignPointer(root, 0, root, 0)
+	}
+	if failed {
+		b.Fatalf("failed to assign")
 	}
 }

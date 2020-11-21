@@ -1,5 +1,3 @@
-// +build amd64
-
 // The MIT License (MIT)
 //
 // Copyright (c) 2019 West Damron
@@ -22,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// gator provides an unsafe region-based memory allocator for Go programs (amd64 only).
+// gator provides an unsafe region-based memory allocator for Go programs.
 package gator
 
 import (
@@ -155,16 +153,6 @@ type RegionHeader struct {
 	Bits [CellCount / 64]uint64
 }
 
-type RegionMeta struct {
-	Tree *RegionTree
-	// Children form a doubly-linked list.
-	Up, Left, Right, Down *Region
-	Flags                 RegionFlags
-	// Metadata extensions (e.g. stack pointer)
-	Ext1 uint32
-	Ext2 interface{}
-}
-
 func (h *RegionHeader) SetBit(index uint) {
 	h.Bits[index/64] |= 1 << (index % 64)
 }
@@ -216,7 +204,7 @@ func (r *Region) Drop() error {
 	if meta.Down != nil {
 		return errors.New("region cannot be dropped until all sub-regions are dropped")
 	}
-	meta.Flags |= FlagDroppedRegion
+	meta.Flags = FlagDroppedRegion
 	tree, up, left, right := meta.Tree, meta.Up, meta.Left, meta.Right
 	if r != tree.Root {
 		up.Header.Meta.Down = right
